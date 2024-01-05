@@ -11,9 +11,25 @@
 #include <mutex>
 #include <condition_variable>
 #include <functional>
-using namespace std;
 //#pragma warning(disable:4996)
 //#define _CRT_SECURE_NO_WARNINGS
+
+using namespace std;
+
+/*int main(int argc, char const* argv[]) {
+
+
+
+
+
+}*/
+
+
+
+
+
+
+
 //抽卡概率
 /*class CardDrawing {
 public:
@@ -190,7 +206,7 @@ int main(int argc,char const*argv[]) {
 }*/
 
 // 假设有一个简单的状态类
-class State {
+/*class State {
 public:
 	int x, y; // 位置
 	int health; // 健康值
@@ -257,4 +273,4 @@ int main(int argc,char const*argv[]) {
 		// 其他逻辑
 	}
 	return 0;
-}
+}*/

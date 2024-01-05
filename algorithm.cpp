@@ -5,6 +5,7 @@
 #include<random>
 #include<unordered_map>
 #include <deque>
+#include <unordered_set>
 using namespace std;
 //#pragma warning(disable:4996)
 //#define _CRT_SECURE_NO_WARNINGS
@@ -673,13 +674,147 @@ public:
 };*/
 
 //第22题 给你两个单链表的头节点 headA 和 headB ，请你找出并返回两个单链表相交的起始节点。如果两个链表没有交点，返回 null 。
-
+/*
 class Solution {
 public:
 	ListNode* getIntersectionNode(ListNode* headA, ListNode* headB) {
+		ListNode* currA = headA;
+		ListNode* currB = headB;
+		int lenA = 0, lenB = 0;
+		while (currA != nullptr) {
+			lenA++;
+			currA = currA->next;
+		}
+		while (currB != nullptr) {
+			lenB++;
+			currB = currB->next;
+		}
+		currA = headA;
+		currB = headB;
+		if (lenA > lenB) {
+			for (int i = 0; i < lenA - lenB; i++) {
+				currA = currA->next;
+			}
+		}else {
+			for (int i = 0; i < lenB - lenA; i++) {
+				currB = currB->next;
+			}
+		}
+		// 同时遍历两个链表，直到找到相交节点
+		while (currA != nullptr && currB != nullptr) {
+			if (currA == currB) {
+				return currA;
+			}
+			currA = currA->next;
+			currB = currB->next;
+		}
+		// 如果没有相交节点，返回nullptr
+		return nullptr;
+	}
+};*/
 
+/* 第23题 给定一个链表的头节点  head ，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
+如果链表中有某个节点，可以通过连续跟踪 next 指针再次到达，则链表中存在环。
+为了表示给定链表中的环，评测系统内部使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。如果 pos 是 -1，则在该链表中没有环。
+注意：pos 不作为参数进行传递，仅仅是为了标识链表的实际情况。
+不允许修改 链表。
+*/
+/*
+class Solution {//快慢指针
+public:
+	ListNode* detectCycle(ListNode* head) {
+		ListNode* fast = head;
+		ListNode* slow = head;
+		while (fast!=nullptr&&fast->next!=nullptr) {
+			fast = fast->next->next;
+			slow = slow->next;
+			if (slow == fast) {
+				ListNode* index1 = fast;
+				ListNode* index2 = head;
+				while (index1 != index2) {//可以画个图理解，从相遇结点和头结点分别出发，相遇点即是环的入口点
+					index1 = index1->next;
+					index2 = index2->next;
+				}
+				return index2;
+			}
+		}
+		return nullptr;
+	}
+};*/
+
+//哈希表
+/* 第24题  给定两个字符串 s 和 t ，编写一个函数来判断 t 是否是 s 的字母异位词。
+注意：若 s 和 t 中每个字符出现的次数都相同，则称 s 和 t 互为字母异位词。
+输入: s = "anagram", t = "nagaram"
+输出: true*/
+
+class Solution {
+public:
+	bool isAnagram(string s, string t) {
+		int record[26] = { 0 };
+		for (int i = 0;i < s.size();i++) {
+			record[s[i] - 'a']++;//记录字符在数组内的相对位置
+		}
+		for (int i = 0;i < t.size();i++) {
+			record[t[i] - 'a']--;
+		}
+		for (int i = 0;i < 26;i++) {
+			if (record[i] != 0) {
+				return false;
+			}
+		}
+		return true;
 	}
 };
+
+/* 第25题 
+*/
+
+class Solution {//数组
+public:
+	vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
+		unordered_set<int> result_set; // 存放结果，之所以用set是为了给结果集去重
+		int hash[1005] = { 0 }; // 默认数值为0
+		for (int num : nums1) { // nums1中出现的字母在hash数组中做记录
+			hash[num] = 1;
+		}
+		for (int num : nums2) { // nums2中出现话，result记录
+			if (hash[num] == 1) {
+				result_set.insert(num);
+			}
+		}
+		return vector<int>(result_set.begin(), result_set.end());
+	}
+};
+
+class Solution {//set
+public:
+	vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
+		unordered_set<int> result_set; // 存放结果，之所以用set是为了给结果集去重
+		unordered_set<int> nums_set(nums1.begin(), nums1.end());
+		for (int num : nums2) {
+			// 发现nums2的元素 在nums_set里又出现过
+			if (nums_set.find(num) != nums_set.end()) {
+				result_set.insert(num);
+			}
+		}
+		return vector<int>(result_set.begin(), result_set.end());
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*//旋转函数
 struct Color {
