@@ -6,6 +6,8 @@
 #include<unordered_map>
 #include <deque>
 #include <unordered_set>
+#include<stack>
+#include<queue>
 using namespace std;
 //#pragma warning(disable:4996)
 //#define _CRT_SECURE_NO_WARNINGS
@@ -476,7 +478,7 @@ public:
 不要使用额外的数组空间，你必须仅使用 O(1) 额外空间并 原地 修改输入数组。
 元素的顺序可以改变。你不需要考虑数组中超出新长度后面的元素。*/
 
-class Solution {
+/*class Solution {
 public:
 	int removeElement(vector<int>& nums, int val) {
 		sort(nums.begin(), nums.end());
@@ -491,7 +493,7 @@ public:
 		}
 		return slow;
 	}
-};
+};*/
 
 //第十八题 给你一个链表的头节点 head 和一个整数 val ，请你删除链表中所有满足 Node.val == val 的节点，并返回 新的头节点 。
 /*
@@ -767,18 +769,18 @@ public:
 	}
 };
 
-/* 第25题 
+/* 第25题 给定两个数组 nums1 和 nums2 ，返回 它们的交集 。输出结果中的每个元素一定是 唯一 的。我们可以 不考虑输出结果的顺序 。
 */
 
 class Solution {//数组
 public:
 	vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
-		unordered_set<int> result_set; // 存放结果，之所以用set是为了给结果集去重
+		unordered_set<int> result_set;// 存放结果，之所以用set是为了给结果集去重
 		int hash[1005] = { 0 }; // 默认数值为0
-		for (int num : nums1) { // nums1中出现的字母在hash数组中做记录
+		for (int num : nums1) { // nums1中出现的元素在hash数组中做记录
 			hash[num] = 1;
 		}
-		for (int num : nums2) { // nums2中出现话，result记录
+		for (int num : nums2) { // nums2中出现的话，result记录
 			if (hash[num] == 1) {
 				result_set.insert(num);
 			}
@@ -790,32 +792,449 @@ public:
 class Solution {//set
 public:
 	vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
-		unordered_set<int> result_set; // 存放结果，之所以用set是为了给结果集去重
-		unordered_set<int> nums_set(nums1.begin(), nums1.end());
+		unordered_set<int> 
+			result_set; // 存放结果，之所以用set是为了给结果集去重
+		unordered_set<int> nums_set(nums1.begin(), nums1.end());//将num1的元素放入该set
 		for (int num : nums2) {
 			// 发现nums2的元素 在nums_set里又出现过
-			if (nums_set.find(num) != nums_set.end()) {
-				result_set.insert(num);
+			if (nums_set.find(num) != nums_set.end()) {//如果num2的元素在nums_set中出现过，将返回一个num的set，而不是返回nums_set
+				result_set.insert(num);//!=即为交集元素，将该元素插入result_set
 			}
 		}
 		return vector<int>(result_set.begin(), result_set.end());
 	}
 };
 
+/*第 26题 编写一个算法来判断一个数 n 是不是快乐数。
+「快乐数」 定义为：
+对于一个正整数，每一次将该数替换为它每个位置上的数字的平方和。
+然后重复这个过程直到这个数变为 1，也可能是 无限循环 但始终变不到 1。
+如果这个过程 结果为 1，那么这个数就是快乐数。
+如果 n 是 快乐数 就返回 true ；不是，则返回 false 。
+*/
+
+class Solution {
+public:
+	int getSum(int n) {
+		//先算各数位上之和
+		int sum = 0;
+		while (n) {
+			sum += (n % 10) * (n % 10);
+			n /= 10;
+		}
+		return sum;
+	}
+	bool isHappy(int n) {
+		unordered_set<int> set;
+		while (1) {//跳出循环
+			int sum = getSum(n);
+			if (sum == 1) {
+				return true;
+			}
+			if (set.find(sum) != set.end()) {//跟25题一样 !=才是在set中有重复元素
+				return false;
+			}else {
+				set.insert(sum);
+			}
+			n = sum;
+		}
+	}
+};
+
+/* 第27题 给你四个整数数组 nums1、nums2、nums3 和 nums4 ，数组长度都是 n ，请你计算有多少个元组 (i, j, k, l) 能满足：
+0 <= i, j, k, l < n
+nums1[i] + nums2[j] + nums3[k] + nums4[l] == 0
+*/
+
+class Solution {
+public:
+	int fourSumCount(vector<int>& A, vector<int>& B, vector<int>& C, vector<int>& D) {
+		unordered_map<int, int> umap; //key:a+b的数值，value:a+b数值出现的次数
+		// 遍历大A和大B数组，统计两个数组元素之和，和出现的次数，放到map中
+		for (int a : A) {
+			for (int b : B) {
+				umap[a + b]++;
+			}
+		}
+		int count = 0; // 统计a+b+c+d = 0 出现的次数
+		// 在遍历大C和大D数组，找到如果 0-(c+d) 在map中出现过的话，就把map中key对应的value也就是出现次数统计出来。
+		for (int c : C) {
+			for (int d : D) {
+				if (umap.find(0 - (c + d)) != umap.end()) {//跟上述一样 .find!=end
+					count += umap[0 - (c + d)];
+				}
+			}
+		}
+		return count;
+	}
+};
+
+/*第28题 给你两个字符串：ransomNote 和 magazine ，判断 ransomNote 能不能由 magazine 里面的字符构成。
+如果可以，返回 true ；否则返回 false 。
+magazine 中的每个字符只能在 ransomNote 中使用一次。
+*/
+
+class Solution {
+public:
+	bool canConstruct(string ransomNote, string magazine) {
+		int record[26] = { 0 };
+		//add
+		if (ransomNote.size() > magazine.size()) {
+			return false;
+		}
+		for (int i = 0; i < magazine.length(); i++) {
+			// 通过record数据记录 magazine里各个字符出现次数
+			record[magazine[i] - 'a'] ++;
+		}
+		for (int j = 0; j < ransomNote.length(); j++) {
+			// 遍历ransomNote，在record里对应的字符个数做--操作
+			record[ransomNote[j] - 'a']--;
+			// 如果小于零说明ransomNote里出现的字符，magazine没有
+			if (record[ransomNote[j] - 'a'] < 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+};
 
 
+/*第29题 给你一个整数数组 nums ，判断是否存在三元组 [nums[i], nums[j], nums[k]] 满足 i != j、i != k 且 j != k ，
+同时还满足 nums[i] + nums[j] + nums[k] == 0 。
+请你返回所有和为 0 且不重复的三元组。
+注意：答案中不可以包含重复的三元组。
+*/
+
+class Solution {
+public:
+	vector<vector<int>> threeSum(vector<int>& nums) {
+		vector<vector<int>> result;
+		sort(nums.begin(), nums.end());//排序之后 所有可能的重复元素都会集中在一起
+		// 找出a + b + c = 0
+		// a = nums[i], b = nums[left], c = nums[right]
+		for (int i = 0; i < nums.size(); i++) {
+			// 排序之后如果第一个元素已经大于零，那么无论如何组合都不可能凑成三元组，直接返回结果就可以了
+			if (nums[i] > 0) {
+				return result;
+			}
+			// 错误去重a方法，将会漏掉-1,-1,2 这种情况
+			/*
+			if (nums[i] == nums[i + 1]) {
+				continue;
+			}
+			*/
+			// 正确去重a方法
+			if (i > 0 && nums[i] == nums[i - 1]) {//因为不符合题设条件
+				continue;//提前结束本次迭代，并开始下一次迭代。
+			}
+			int left = i + 1;
+			int right = nums.size() - 1;
+			while (right > left) {
+				// 去重复逻辑如果放在这里，0，0，0 的情况，可能直接导致 right<=left 了，从而漏掉了 0,0,0 这种三元组
+				/*
+				while (right > left && nums[right] == nums[right - 1]) right--;
+				while (right > left && nums[left] == nums[left + 1]) left++;
+				*/
+				if (nums[i] + nums[left] + nums[right] > 0) right--;
+				else if (nums[i] + nums[left] + nums[right] < 0) left++;
+				else {
+					result.push_back(vector<int>{nums[i], nums[left], nums[right]});//push_back是在数组末尾添加元素
+					// 去重逻辑应该放在找到一个三元组之后，对b 和 c去重
+					while (right > left && nums[right] == nums[right - 1]) right--;
+					while (right > left && nums[left] == nums[left + 1]) left++;
+
+					// 找到答案时，双指针同时收缩
+					right--;
+					left++;
+				}
+			}
+
+		}
+		return result;
+	}
+};
+
+/*第30题 给你一个由 n 个整数组成的数组 nums ，和一个目标值 target 。
+请你找出并返回满足下述全部条件且不重复的四元组 [nums[a], nums[b], nums[c], nums[d]] （若两个四元组元素一一对应，则认为两个四元组重复）：
+0 <= a, b, c, d < n
+a、b、c 和 d 互不相同
+nums[a] + nums[b] + nums[c] + nums[d] == target
+你可以按 任意顺序 返回答案 。
+*/
+
+class Solution {
+public:
+	vector<vector<int>> fourSum(vector<int>& nums, int target) {
+		vector<vector<int> > res_list;
+		if (nums.size() < 4) {
+			return res_list;
+		}
+		sort(nums.begin(), nums.end());
+		int len = nums.size();
+		for (int i = 0; i < len - 3; ++i) {
+			if (i > 0 && nums[i] == nums[i - 1]) {
+				continue;
+			}
+			/*
+			Since we sort the nums first, the smallest 4 numbers have to be less than target,
+			or there has no quadruplets that can
+			*/
+			if ((long)nums[i] + nums[i + 1] + nums[i + 2] + nums[i + 3] > target) {
+				break;
+			}//不满足条件
+			if ((long)nums[i] + nums[len - 3] + nums[len - 2] + nums[len - 1] < target) {
+				continue;
+			}//去重
+			for (int j = i + 1; j < len - 2; j++) {
+				if (j > i + 1 && nums[j] == nums[j - 1]) {
+					continue;
+				}
+				if ((long)nums[i] + nums[j] + nums[j + 1] + nums[j + 2] > target) {
+					break;
+				}
+				if ((long)nums[i] + nums[j] + nums[len - 2] + nums[len - 1] < target) {
+					continue;
+				}
+				int left = j + 1, right = len - 1;
+				while (left < right) {
+					long sum = (long)nums[i] + nums[j] + nums[left] + nums[right];
+					if (sum == target) {
+						res_list.push_back({ nums[i], nums[j], nums[left], nums[right] });
+						while (left < right && nums[left] == nums[left + 1]) {
+							left++;
+						}
+						left++;
+						while (left < right && nums[right] == nums[right - 1]) {
+							right--;
+						}
+						right--;
+					}
+					else if (sum < target) {
+						left++;
+					}
+					else {
+						right--;
+					}
+				}
+			}
+		}
+		return res_list;
+	}
+};
+
+//字符串部分 
+/* 第31题 编写一个函数，其作用是将输入的字符串反转过来。输入字符串以字符数组 s 的形式给出。
+不要给另外的数组分配额外的空间，你必须原地修改输入数组、使用 O(1) 的额外空间解决这一问题
+*/
 
 
+class Solution {
+public:
+	void reverseString(vector<char>& s) {
+		int left = 0, right = s.size() - 1;
+		while (left <= right) {
+			swap(s[left], s[right]);
+			left++;
+			right--;
+		}
+	}
+};
+
+/* 第32题 给定一个字符串 s 和一个整数 k，从字符串开头算起，每计数至 2k 个字符，就反转这 2k 字符中的前 k 个字符。
+如果剩余字符少于 k 个，则将剩余字符全部反转。
+如果剩余字符小于 2k 但大于或等于 k 个，则反转前 k 个字符，其余字符保持原样。
+*/
+
+class Solution {
+public:
+	string reverseStr(string s, int k) {
+		for (int i = 0; i < s.size(); i += (2 * k)) {
+			// 1. 每隔 2k 个字符的前 k 个字符进行反转
+			// 2. 剩余字符小于 2k 但大于或等于 k 个，则反转前 k 个字符
+			if (i + k <= s.size()) {
+				reverse(s.begin() + i, s.begin() + i + k);
+			}
+			else {
+				// 3. 剩余字符少于 k 个，则将剩余字符全部反转。
+				reverse(s.begin() + i, s.end());
+			}
+		}
+		return s;
+	}
+};
+
+/*第33题 给你一个字符串 s ，请你反转字符串中 单词 的顺序。
+单词 是由非空格字符组成的字符串。s 中使用至少一个空格将字符串中的 单词 分隔开。
+返回 单词 顺序颠倒且 单词 之间用单个空格连接的结果字符串。
+注意：输入字符串 s中可能会存在前导空格、尾随空格或者单词间的多个空格。返回的结果字符串中，单词间应当仅用单个空格分隔，且不包含任何额外的空格。
+*/
+
+class Solution {
+public:
+	void reverse(string& s, int start, int end) {
+		for (int i = start, j = end;i < j;i++, j--) {
+			swap(s[i], s[j]);
+		}
+	}
+	void removeExtraSpaces(string& s) {//去除前后多余空格
+		int slow = 0;
+		for (int i = 0;i < s.size();++i) {
+			if (s[i] != ' ') {
+				if (slow != 0) {
+					s[slow++] = ' ';
+				}
+				while (i < s.size() && s[i] != ' ') {
+					s[slow++] = s[i++];
+				}
+			}
+		}
+		s.resize(slow);//resize用来调整数组大小
+	}
+	string reverseWords(string s) {
+		removeExtraSpaces(s);//去除多余空格
+		reverse(s, 0, s.size() - 1);
+		int start = 0;
+		for (int i = 0;i <= s.size();++i) {
+			if (i != s.size() || s[i] != ' ') {
+				reverse(s, start, i - 1);
+				start = i + 1;
+			}
+			
+		}
+		return s;
+	}
+};
 
 
+/*第34题 给你两个字符串 haystack 和 needle ，请你在 haystack 字符串中找出 needle 字符串的第一个匹配项的下标（下标从 0 开始）。
+如果 needle 不是 haystack 的一部分，则返回  -1 。
+*/
 
+class Solution {//KMP
+public:
+	void getNext(int* next, const string& s) {
+		int j = -1;
+		next[0] = j;
+		for (int i = 1; i < s.size(); i++) { // 注意i从1开始
+			while (j >= 0 && s[i] != s[j + 1]) { // 前后缀不相同了
+				j = next[j]; // 向前回退
+			}
+			if (s[i] == s[j + 1]) { // 找到相同的前后缀
+				j++;
+			}
+			next[i] = j; // 将j（前缀的长度）赋给next[i]
+		}
+	}
+	int strStr(string haystack, string needle) {
+		if (needle.size() == 0) {
+			return 0;
+		}
+		//int next[needle.size()];
+		int* next = new int[needle.size()];//更安全，更易于管理内存。在使用动态分配的数组时，始终记得在使用完毕后释放内存。
+		getNext(next, needle);
+		int j = -1; // // 因为next数组里记录的起始位置为-1
+		for (int i = 0; i < haystack.size(); i++) { // 注意i就从0开始
+			while (j >= 0 && haystack[i] != needle[j + 1]) { // 不匹配
+				j = next[j]; // j 寻找之前匹配的位置
+			}
+			if (haystack[i] == needle[j + 1]) { // 匹配，j和i同时向后移动
+				j++; // i的增加在for循环里
+			}
+			if (j == (needle.size() - 1)) { // 文本串s里出现了模式串t
+				return (i - needle.size() + 1);
+			}
+		}
+		delete[] next;//释放内存
+		return -1;
+	}
+};
 
+/*第35题 请你仅使用两个栈实现先入先出队列。队列应当支持一般队列支持的所有操作（push、pop、peek、empty）：
+实现 MyQueue 类：
+void push(int x) 将元素 x 推到队列的末尾
+int pop() 从队列的开头移除并返回元素
+int peek() 返回队列开头的元素
+boolean empty() 如果队列为空，返回 true ；否则，返回 false
+*/
 
+class MyQueue {
+public:
+	stack<int>Sin;//构造栈的写法
+	stack<int>Sout;
+	MyQueue() {
 
+	}
 
+	void push(int x) {//入栈就是简单地在Sin中入栈
+		Sin.push(x);
+	}
 
+	int pop() {
+		//只有Sout为空时，才能从Sin中导入数据(全部) 因为出栈要从Sout出
+		if (Sout.empty()) {
+			while (!Sin.empty()) {
+				Sout.push(Sin.top());//送入Sin的元素
+				Sin.pop();
+			}
+		}
+		int result = Sout.top();
+		Sout.pop();
+		return result;
+	}
 
+	int peek() {//查看函数
+		int res = this->pop();//直接使用已有的pop函数
+		Sout.push(res);//因为pop弹出了res，所以再添加回去
+		return res;
+	}
 
+	bool empty() {
+		return Sin.empty() && Sout.empty();
+	}
+};
+
+/*第36题 请你仅使用两个队列实现一个后入先出（LIFO）的栈，并支持普通栈的全部四种操作（push、top、pop 和 empty）。
+实现 MyStack 类：
+void push(int x) 将元素 x 压入栈顶。
+int pop() 移除并返回栈顶元素。
+int top() 返回栈顶元素。
+boolean empty() 如果栈是空的，返回 true ；否则，返回 false 
+*/
+
+class MyStack {
+public:
+	queue<int> que;//队列构造写法
+	/** Initialize your data structure here. */
+	MyStack() {
+
+	}
+	/** Push element x onto stack. */
+	void push(int x) {
+		que.push(x);
+	}
+	/** Removes the element on top of the stack and returns that element. */
+	int pop() {
+		int size = que.size();
+		size--;
+		while (size--) { // 将队列头部的元素（除了最后一个元素外） 重新添加到队列尾部
+			que.push(que.front());
+			que.pop();
+		}
+		int result = que.front(); // 此时弹出的元素顺序就是栈的顺序了
+		que.pop();
+		return result;
+	}
+
+	/** Get the top element. */
+	int top() {
+		return que.back();
+	}
+
+	/** Returns whether the stack is empty. */
+	bool empty() {
+		return que.empty();
+	}
+};
 /*//旋转函数
 struct Color {
 	int r;
@@ -861,6 +1280,575 @@ int main(int argc,char const*argv[]) {
 	delete rev;
 	return 0;
 }*/
+
+/*第37题 给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串 s ，判断字符串是否有效。
+有效字符串需满足：
+左括号必须用相同类型的右括号闭合。
+左括号必须以正确的顺序闭合。
+每个右括号都有一个对应的相同类型的左括号。
+*/
+
+class Solution {
+public:
+	bool isValid(string s) {
+		if (s.size() % 2 != 0) {
+			return false;
+		}
+		stack<char>st;
+		for (int i = 0;i < s.size();i++) {
+			if (s[i] == '(') {
+				st.push(')');
+			}else if (s[i] == '{') {
+				st.push('}');
+			}else if (s[i] == '[') {
+				st.push(']');
+			}else if (st.empty() || st.top() != s[i]) {
+				return false;
+			}else {
+				st.pop();
+			}
+		}
+		return st.empty();
+	}
+};
+
+/*第38题 给出由小写字母组成的字符串 S，重复项删除操作会选择两个相邻且相同的字母，并删除它们。
+在 S 上反复执行重复项删除操作，直到无法继续删除。
+在完成所有重复项删除操作后返回最终的字符串。答案保证唯一。
+*/
+
+class Solution {
+public:
+	string removeDuplicates(string s) {
+		stack<char>st;
+		for (char S : s) {
+			if (st.empty() || S != st.top()) {
+				st.push(S);
+			}else {
+				st.pop();
+			}
+		}
+		string result = "";
+		while (!st.empty()) {
+			result += st.top();
+			st.pop();
+		}
+		reverse(result.begin(), result.end());
+		return result;
+	}
+};
+
+class Solution {
+public:
+	string removeDuplicates(string s) {
+		string result;//将字符串自己当成栈
+		for (char S : s) {
+			if (result.empty() || result.back() != S) {
+				result.push_back(S);//将元素放入result
+			}else {
+				result.pop_back();
+			}
+		}
+		return result;
+	}
+};
+
+/*第38题 给你一个字符串数组 tokens ，表示一个根据 逆波兰表示法 表示的算术表达式。
+请你计算该表达式。返回一个表示表达式值的整数。
+注意：
+有效的算符为 '+'、'-'、'*' 和 '/' 。
+每个操作数（运算对象）都可以是一个整数或者另一个表达式。
+两个整数之间的除法总是 向零截断 。
+表达式中不含除零运算。
+输入是一个根据逆波兰表示法表示的算术表达式。
+答案及所有中间计算结果可以用 32 位 整数表示。
+*/
+
+class Solution {//即后缀表示法
+public:
+	int evalRPN(vector<string>& tokens) {
+		stack<long long>st;
+		for (int i = 0;i < tokens.size();i++) {
+			if (tokens[i] == "+" || tokens[i] == "-" || tokens[i] == "*" || tokens[i] == "/") {
+				long long num1 = st.top();
+				st.pop();
+				long long num2 = st.top();
+				st.pop();
+				if (tokens[i] == "+") {
+					st.push(num2 + num1);
+				}if (tokens[i] == "-") {
+					st.push(num2 - num1);
+				}if (tokens[i] == "*") {
+					st.push(num2 * num1);
+				}if (tokens[i] == "/") {
+					st.push(num2 / num1);
+				}
+			}else {
+					st.push(stoll(tokens[i]));//stoll用于将字符串转换成long long
+				}
+		}
+		int result = st.top();
+		st.pop();
+		return result;
+	}
+};
+
+/*第39题 给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右侧。
+你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。
+返回 滑动窗口中的最大值 
+*/
+
+class Solution {
+private://私有队列类
+	class MyQueue {//用队列实现
+	public:
+		deque<int>queue;
+		void pop(int value) {
+			if (!queue.empty() && value == queue.front()) {
+				queue.pop_front();//比较要弹出数值是否等于队列出口元素
+			}
+		}
+		void push(int value) {
+			while (!queue.empty() && value > queue.back()) {
+				queue.pop_back();//如果压栈元素大于入口元素数值，那么弹出尾端数值，保证单调队列
+			}
+			queue.push_back(value);
+		}
+		int front() {//查询当前队列最大值 直接返回队列前端
+			return queue.front();
+		}
+	};
+public:
+	vector<int>masSlidingWindow(vector<int>& nums, int k) {
+		MyQueue Q;
+		vector<int>result;
+		for (int i = 0;i < nums.size();i++) {
+			Q.pop(nums[i - k]);//滑动移除窗口最前面元素,一开始小于k时不产生循环
+			Q.push(nums[i]);
+			result.push_back(Q.front());//记录当前最大值
+		}
+		return result;
+	}
+};
+
+/*第40题 给你一个整数数组 nums 和一个整数 k ，请你返回其中出现频率前 k 高的元素。你可以按 任意顺序 返回答案。
+*/
+
+class Solution {//大数
+public:
+	//建一个小根堆
+	class mycomparison{
+	public:
+		bool operator()(const pair<int, int>& lhs, const pair<int, int>& rhs) {
+			return lhs.second > rhs.second;//pair 中的第二个元素将被用作排序的关键字。
+		}
+	};
+	vector<int> topKFrequent(vector<int>& nums, int k) {
+		unordered_map<int, int>map;//map<nums[i],对应出现的次数
+		for (int i = 0;i < nums.size();i++) {//统计元素出现的频率
+			map[nums[i]]++;
+		}
+		//对频率排序
+		//定义小根堆
+		priority_queue<pair<int, int>, vector<pair<int, int>>, mycomparison>pri_que;//priority_queue优先级队列就是根堆 标准写法 记一下
+		for (unordered_map<int, int>::iterator it = map.begin();it != map.end();it++) {
+			pri_que.push(*it);
+			if (pri_que.size() > k) {
+				pri_que.pop();//如果堆的大小大于k，则队列弹出
+			}
+		}
+		vector<int>result(k);
+		for (int i = k - 1;i >= 0;i--) {
+			result[i] = pri_que.top().first;
+			pri_que.pop();
+		}
+		return result;
+	}
+};
+
+//二叉树
+
+/*struct TreeNode {
+      int val;
+      TreeNode *left;
+      TreeNode *right;
+      TreeNode() : val(0), left(nullptr), right(nullptr) {}
+      TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ };
+ */
+struct TreeNode {
+	int val;
+	TreeNode* left;
+	TreeNode* right;
+	TreeNode(int x) :val(x), left(nullptr), right(nullptr) {}
+};
+
+/*第41题 三大遍历
+*/
+class Solution {//先序遍历
+public:
+	vector<int> preorderTraversal(TreeNode* root) {
+		stack<TreeNode*>Tree;
+		vector<int>result;
+		if (root == nullptr) {
+			return result;
+		}
+		Tree.push(root);
+		while (!Tree.empty()) {
+			TreeNode* node = Tree.top();
+			Tree.pop();
+			result.push_back(node->val);
+			if (node->right) {//进栈根右左，出栈根左右
+				Tree.push(node->right);
+			}
+			if (node->left) {
+				Tree.push(node->left);
+			}
+		}
+		return result;
+	}
+};
+
+class Solution {//迭代法
+public:
+	vector<int> preorderTraversal(TreeNode* root) {
+		vector<int> result;
+		stack<TreeNode*> st;
+		if (root != NULL) st.push(root);
+		while (!st.empty()) {
+			TreeNode* node = st.top();
+			if (node != NULL) {
+				st.pop();
+				if (node->right) st.push(node->right);  // 右
+				if (node->left) st.push(node->left);    // 左
+				st.push(node);                          // 中
+				st.push(NULL);
+			}
+			else {
+				st.pop();
+				node = st.top();
+				st.pop();
+				result.push_back(node->val);
+			}
+		}
+		return result;
+	}
+};
+
+class Solution {//中序遍历
+public:
+	vector<int> inorderTraversal(TreeNode* root) {
+		vector<int> result;
+		stack<TreeNode*> Tree;
+		TreeNode* curr = root;
+		while (curr != NULL || !Tree.empty()) {
+			if (curr != NULL) { // 指针来访问节点，访问到最底层
+				Tree.push(curr); // 将访问的节点放进栈
+				curr = curr->left;                // 左
+			}
+			else {
+				curr = Tree.top(); // 从栈里弹出的数据，就是要处理的数据（放进result数组里的数据）
+				Tree.pop();
+				result.push_back(curr->val);     // 中
+				curr = curr->right;               // 右
+			}
+		}
+		return result;
+	}
+};
+class Solution {//迭代法中序遍历
+public:
+	vector<int> inorderTraversal(TreeNode* root) {
+		vector<int> result;
+		stack<TreeNode*> st;
+		if (root != NULL) st.push(root);
+		while (!st.empty()) {
+			TreeNode* node = st.top();
+			if (node != NULL) {
+				st.pop(); // 将该节点弹出，避免重复操作，下面再将右中左节点添加到栈中
+				if (node->right) st.push(node->right);  // 添加右节点（空节点不入栈）
+
+				st.push(node);                          // 添加中节点
+				st.push(NULL); // 中节点访问过，但是还没有处理，加入空节点做为标记。
+
+				if (node->left) st.push(node->left);    // 添加左节点（空节点不入栈）
+			}
+			else { // 只有遇到空节点的时候，才将下一个节点放进结果集
+				st.pop();           // 将空节点弹出
+				node = st.top();    // 重新取出栈中元素
+				st.pop();
+				result.push_back(node->val); // 加入到结果集
+			}
+		}
+		return result;
+	}
+};
+
+class Solution {//后序遍历
+public:
+	vector<int>postorderTraversal(TreeNode* root) {
+		stack<TreeNode*> Tree;
+		vector<int>result;
+		if (root == nullptr) {
+			return result;
+		}
+		Tree.push(root);
+		while (!Tree.empty()) {
+			TreeNode* node = Tree.top();
+			Tree.pop();
+			result.push_back(node->val);
+			if (node->left) {
+				Tree.push(node->left);
+			}
+			if (node->right) {
+				Tree.push(node->right);
+			}
+		}
+		reverse(result.begin(), result.end());
+		return result;
+	}
+};
+
+class Solution {//迭代法
+public:
+	vector<int> postorderTraversal(TreeNode* root) {
+		vector<int> result;
+		stack<TreeNode*> st;
+		if (root != NULL) st.push(root);
+		while (!st.empty()) {
+			TreeNode* node = st.top();
+			if (node != NULL) {
+				st.pop();
+				st.push(node);                          // 中
+				st.push(NULL);
+
+				if (node->right) st.push(node->right);  // 右
+				if (node->left) st.push(node->left);    // 左
+
+			}
+			else {
+				st.pop();
+				node = st.top();
+				st.pop();
+				result.push_back(node->val);
+			}
+		}
+		return result;
+	}
+};
+
+//第42题 层序遍历
+
+
+class Solution {
+public:
+	vector<vector<int>>levelOrder(TreeNode* root) {
+		queue<TreeNode*>que;
+		if (root != nullptr) {
+			que.push(root);
+		}
+		vector<vector<int >> result;
+		while (!que.empty()) {
+			int size = que.size();
+			vector<int>vec;
+			for (int i = 0;i < size;i++) {
+				TreeNode* node = que.front();//最开始即为根结点
+				que.pop();
+				vec.push_back(node->val);
+				if (node->left) {
+					que.push(node->left);//层序遍历
+				}
+				if (node->right) {
+					que.push(node->right);
+				}
+			}
+			result.push_back(vec);
+		}
+		return result;
+	}
+};
+
+//层序遍历2
+
+class Solution {//从下往上
+public:
+	vector<vector<int>>levelOrderBottom(TreeNode* root) {
+		queue<TreeNode*>que;
+		if (root != nullptr) {
+			que.push(root);
+		}
+		vector<vector<int>>result;
+		while (!que.empty()) {
+			int size = que.size();
+			vector<int>vec;
+			for (int i = 0;i < size;i++) {
+				TreeNode* node = que.front();
+				que.pop();
+				vec.push_back(node->val);
+				if (node->left) {
+					que.push(node->left);
+				}
+				if (node->right) {
+					que.push(node->right);
+				}
+			}
+			result.push_back(vec);
+		}
+		reverse(result.begin(), result.end());
+		return result;
+	}
+};
+
+//给定一个二叉树的 根节点 root，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值。
+
+class Solution {
+public:
+	vector<int> rightSideView(TreeNode* root) {
+		queue<TreeNode*>que;
+		if (root != nullptr) {
+			que.push(root);
+		}
+		vector<int>result;
+		while (!que.empty()) {
+			int size = que.size();//重点在于理解这个size
+			for (int i = 0;i < size;i++) {
+				TreeNode* node = que.front();
+				que.pop();
+				if (i == (size - 1)) {//每层最后一个
+					result.push_back(node->val);
+				}
+				if (node->left) {
+					que.push(node->left);
+				}
+				if (node->right) {
+					que.push(node->right);
+				}
+			}	
+		}
+		return result;
+	}
+};
+
+//给定一个非空二叉树的根节点 root , 以数组的形式返回每一层节点的平均值。与实际答案相差 10-5 以内的答案可以被接受。
+
+class Solution {
+public:
+	vector<double> averageOfLevels(TreeNode* root) {
+		queue<TreeNode*>que;
+		if (root != nullptr) {
+			que.push(root);
+		}
+		vector<double>result;
+		while (!que.empty()) {
+			int size = que.size();
+			double sum = 0;
+			for (int i = 0;i < size;i++) {
+				TreeNode* node = que.front();
+				que.pop();
+				sum += node->val;
+				if (node->left) {
+					que.push(node->left);
+				}
+				if (node->right) {
+					que.push(node->right);
+				}
+			}
+			result.push_back(sum / size);
+		}
+		return result;
+	}
+};
+
+/*给定一个 N 叉树，返回其节点值的层序遍历。（即从左到右，逐层遍历）。
+树的序列化输入是用层序遍历，每组子节点都由 null 值分隔（参见示例）。
+*/
+
+class Node {//N叉树结点定义
+public:
+	int val;
+	vector<Node*> children;
+
+	Node() {}
+
+	Node(int _val) {
+		val = _val;
+	}
+
+	Node(int _val, vector<Node*> _children) {
+		val = _val;
+		children = _children;
+	}
+};
+
+class Solution {
+public:
+	vector<vector<int>> levelOrder(Node* root) {
+		queue<Node*>que;
+		if (root != nullptr) {
+			que.push(root);
+		}
+		vector<vector<int>>result;
+		while (!que.empty()) {
+			int size = que.size();
+			vector<int>vec;
+			for (int i = 0;i < size;i++) {
+				Node* node = que.front();
+				que.pop();
+				vec.push_back(node->val);
+				for (int i = 0;i < node->children.size();i++) {
+					if (node->children[i]) {//将结点海子加入队列
+						que.push(node->children[i]);
+					}
+				}
+				
+			}
+			result.push_back(vec);
+		}
+		return result;
+	}
+};
+
+//给定一棵二叉树的根节点 root ，请找出该二叉树中每一层的最大值。
+
+class Solution {
+public:
+	vector<int> largestValues(TreeNode* root) {
+		queue<TreeNode*>que;
+		if (root != nullptr) {
+			que.push(root);
+		}
+		vector<int>result;
+		while (!que.empty()) {
+			int size = que.size();
+			int maxValue = INT_MIN;
+			for (int i = 0;i < size;i++) {
+				TreeNode* node = que.front();
+				que.pop();
+				maxValue = node->val > maxValue ? node->val : maxValue;
+				if (node->left) {
+					que.push(node->left);
+				}
+				if (node->right) {
+					que.push(node->right);
+				}
+			}
+			result.push_back(maxValue);
+		}
+		return result;
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
 //寻找元素
 /*class Solution {
 public:
