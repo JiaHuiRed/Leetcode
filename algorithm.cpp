@@ -1764,7 +1764,7 @@ public:
 树的序列化输入是用层序遍历，每组子节点都由 null 值分隔（参见示例）。
 */
 
-class Node {//N叉树结点定义
+/*class Node {//N叉树结点定义
 public:
 	int val;
 	vector<Node*> children;
@@ -1807,7 +1807,7 @@ public:
 		}
 		return result;
 	}
-};
+};*/
 
 //给定一棵二叉树的根节点 root ，请找出该二叉树中每一层的最大值。
 
@@ -1839,7 +1839,196 @@ public:
 	}
 };
 
+/*给定一个 完美二叉树 ，其所有叶子节点都在同一层，每个父节点都有两个子节点。二叉树定义如下：
+填充它的每个 next 指针，让这个指针指向其下一个右侧节点。如果找不到下一个右侧节点，则将 next 指针设置为 NULL。
+初始状态下，所有 next 指针都被设置为 NULL。
+*/
+struct Node {
+	int val;
+	Node* left;
+	Node* right;
+	Node* next;
+};
 
+class Solution {
+public:
+	Node* connect(Node* root) {
+		queue<Node*>que;
+		if (root != nullptr) {
+			que.push(root);
+		}
+		while (!que.empty()) {
+			int size = que.size();
+			Node* nodePre;
+			Node* node;
+			for (int i = 0;i < size;i++) {
+				if (i == 0) {
+					nodePre = que.front();//取出一层的头结点
+					que.pop();
+					node = nodePre;
+				}else {
+					node = que.front();
+					que.pop();
+					nodePre->next = node;
+					nodePre = nodePre->next;
+				}
+				if (node->left) {
+					que.push(node->left);
+				}
+				if (node->right) {
+					que.push(node->right);
+				}
+			}
+			nodePre->next = nullptr;
+		}
+		return root;
+	}
+};
+
+/* 给定一个二叉树：
+struct Node {
+  int val;
+  Node *left;
+  Node *right;
+  Node *next;
+}
+填充它的每个 next 指针，让这个指针指向其下一个右侧节点。如果找不到下一个右侧节点，则将 next 指针设置为 NULL 。
+初始状态下，所有 next 指针都被设置为 NULL 
+*/
+
+class Solution {
+public:
+	Node* connect(Node* root) {
+		queue<Node*>que;
+		if (root != nullptr) {
+			que.push(root);
+		}
+		while (!que.empty()) {
+			int size = que.size();
+			vector<int>vec;
+			Node* nodePre;
+			Node* node;
+			for (int i = 0;i < size;i++) {
+				if (i == 0) {
+					nodePre = que.front();
+					que.pop();
+					node = nodePre;
+				}else {
+					node = que.front();
+					que.pop();
+					nodePre->next = node;
+					nodePre = nodePre->next;
+				}
+				if (node->left) {
+					que.push(node->left);
+				}
+				if (node->right) {
+					que.push(node->right);
+				}
+			}
+			nodePre->next = nullptr;
+		}
+		return root;
+	}
+};
+
+//返回二叉树其最大深度。 是指从根节点到最远叶子节点的最长路径上的节点数。
+
+class Solution {
+public:
+	int maxDepth(TreeNode* root) {
+		if (root == nullptr) {
+			return 0;
+		}
+		int depth = 0;
+		queue<TreeNode*>que;
+		que.push(root);
+		while (!que.empty()) {
+			int size = que.size();
+			depth++;
+			for (int i = 0;i < size;i++) {
+				TreeNode* node = que.front();
+				que.pop();
+				if (node->left) {
+					que.push(node->left);
+				}
+				if (node->right) {
+					que.push(node->right);
+				}
+			}
+		}
+		return depth;
+	}
+};
+
+//给定一个二叉树，找出其最小深度。
+
+class Solution {
+public:
+	int minDepth(TreeNode* root) {
+		if (root == nullptr) {
+			return 0;
+		}
+		int depth = 0;
+		queue<TreeNode*>que;
+		que.push(root);
+		while (!que.empty()) {
+			int size = que.size();
+			depth++;
+			for (int i = 0;i < size;i++) {
+				TreeNode* node = que.front();
+				que.pop();
+				if (node->left) {
+					que.push(node->left);
+				}
+				if (node->right) {
+					que.push(node->right);
+				}
+				if (!node->left && !node->right) {
+					return depth;
+				}
+			}
+		}
+		return depth;
+	}
+};
+
+//第43题 给你一棵二叉树的根节点 root ，翻转这棵二叉树，并返回其根节点。
+
+class Solution {
+public:
+	TreeNode* invertTree(TreeNode* root) {//前序遍历实现
+		if (root == nullptr) {
+			return root;
+		}
+		swap(root->left, root->right);
+		invertTree(root->left);
+		invertTree(root->right);
+		return root;
+	}
+};
+
+class Solution {//广度优先遍历 层序遍历
+public:
+	TreeNode* invertTree(TreeNode* root) {
+		queue<TreeNode*> que;
+		if (root != NULL) que.push(root);
+		while (!que.empty()) {
+			int size = que.size();
+			for (int i = 0; i < size; i++) {
+				TreeNode* node = que.front();
+				que.pop();
+				swap(node->left, node->right); // 节点处理
+				if (node->left) que.push(node->left);
+				if (node->right) que.push(node->right);
+			}
+		}
+		return root;
+	}
+};
+
+/*第44题
+*/
 
 
 
