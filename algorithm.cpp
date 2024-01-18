@@ -1797,7 +1797,7 @@ public:
 				que.pop();
 				vec.push_back(node->val);
 				for (int i = 0;i < node->children.size();i++) {
-					if (node->children[i]) {//将结点海子加入队列
+					if (node->children[i]) {//将结点孩子加入队列
 						que.push(node->children[i]);
 					}
 				}
@@ -1843,7 +1843,7 @@ public:
 填充它的每个 next 指针，让这个指针指向其下一个右侧节点。如果找不到下一个右侧节点，则将 next 指针设置为 NULL。
 初始状态下，所有 next 指针都被设置为 NULL。
 */
-struct Node {
+/*struct Node {
 	int val;
 	Node* left;
 	Node* right;
@@ -1883,7 +1883,7 @@ public:
 		}
 		return root;
 	}
-};
+};*/
 
 /* 给定一个二叉树：
 struct Node {
@@ -1896,7 +1896,7 @@ struct Node {
 初始状态下，所有 next 指针都被设置为 NULL 
 */
 
-class Solution {
+/*class Solution {
 public:
 	Node* connect(Node* root) {
 		queue<Node*>que;
@@ -1930,7 +1930,7 @@ public:
 		}
 		return root;
 	}
-};
+};*/
 
 //返回二叉树其最大深度。 是指从根节点到最远叶子节点的最长路径上的节点数。
 
@@ -2027,8 +2027,374 @@ public:
 	}
 };
 
-/*第44题
+/*第44题 给你一个二叉树的根节点 root ， 检查它是否轴对称。
 */
+
+class Solution {
+public:
+	bool compare(TreeNode* left, TreeNode* right) {
+		//首先排除空节点情况
+		if (left == nullptr && right != nullptr) {
+			return false;
+		}else if (left != nullptr && right == nullptr) {
+			return false;
+		}else if (left == nullptr && right == nullptr) {
+			return true;
+		}else if (left->val != right->val) {
+			return false;
+		}//排除数值不同的情况
+		//剩下的就是左右节点不为空，且数值相同的情况
+		bool outside = compare(left->left, right->right);
+		bool inside = compare(left->right, right->left);
+		bool isSame = outside && inside;
+		return isSame;
+	}
+	bool isSymmetric(TreeNode* root) {
+		if (root == nullptr) {
+			return true;
+		}
+		return compare(root->left, root->right);
+	}
+};
+
+//剪枝
+class Solution {
+public:
+	bool compare(TreeNode*left,TreeNode*right){
+		if (left != nullptr && right == nullptr) {
+			return false;
+		}else if (left == nullptr && right != nullptr) {
+			return false;
+		}else if (left == nullptr && right == nullptr) {
+			return true;
+		}else if (left->val != right->val) {
+			return false;
+		}else {
+			return compare(left->left, right->right) && compare(left->right, right->left);
+		}
+	}
+	bool isSymmetric(TreeNode* root) {
+		if (root == nullptr) {
+			return true;
+		}
+		return compare(root->left, root->right);
+	}
+};
+
+/*第45题 给你两棵二叉树的根节点 p 和 q ，编写一个函数来检验这两棵树是否相同。
+如果两个树在结构上相同，并且节点具有相同的值，则认为它们是相同的。
+
+*/
+
+class Solution {
+public:
+	bool compare(TreeNode* p, TreeNode* q) {
+		//排除两树有空节点的情况
+		if (p == nullptr && q != nullptr) {
+			return false;
+		}else if (p != nullptr && q == nullptr) {
+			return false;
+		}else if (p == nullptr && q == nullptr) {
+			return true;
+		}else if (p->val != q->val) {//开始考虑不是空树的情况
+			return false;
+		}else {
+			return compare(p->left, q->left) && compare(p->right, q->right);
+		}
+	}
+	bool isSameTree(TreeNode* p, TreeNode* q) {
+		return compare(p, q);
+	}
+};
+
+/*第46题 给你两棵二叉树 root 和 subRoot 。检验 root 中是否包含和 subRoot 具有相同结构和节点值的子树。
+如果存在，返回 true ；否则，返回 false 。
+二叉树 tree 的一棵子树包括 tree 的某个节点和这个节点的所有后代节点。
+tree 也可以看做它自身的一棵子树。
+*/
+
+class Solution {
+public:
+	bool compare(TreeNode* p, TreeNode* q) {//判断两树相同的函数
+		//排除两树有空节点的情况
+		if (p == nullptr && q != nullptr) {
+			return false;
+		}
+		else if (p != nullptr && q == nullptr) {
+			return false;
+		}
+		else if (p == nullptr && q == nullptr) {
+			return true;
+		}
+		else if (p->val != q->val) {//开始考虑不是空树的情况
+			return false;
+		}
+		else {
+			return compare(p->left, q->left) && compare(p->right, q->right);
+		}
+	}
+	bool isSubtree(TreeNode* root, TreeNode* subRoot) {
+		if (!root) { //root不可能走到空
+			return false;
+		}
+		if (compare(root, subRoot)) {
+			return true;
+		}
+		return isSubtree(root->left, subRoot) || isSubtree(root->right, subRoot); //左边为真就不用求右边了，所以是或关系
+	}
+};
+
+/*第47题 给定一个 N 叉树，找到其最大深度。
+最大深度是指从根节点到最远叶子节点的最长路径上的节点总数。
+N 叉树输入按层序遍历序列化表示，每组子节点由空值分隔
+*/
+
+/*class Node {
+public:
+	int val;
+	vector<Node*> children;
+
+	Node() {}
+
+	Node(int _val) {
+		val = _val;
+	}
+
+	Node(int _val, vector<Node*> _children) {
+		val = _val;
+		children = _children;
+	}
+};
+
+class Solution {
+public:
+	int maxDepth(Node* root) {
+		if (root == nullptr) {
+			return 0;
+		}
+		int depth = 0;
+		for (auto child : root->children) {//int i = 0; i < root->children.size(); i++ auto更现代
+			depth = max(depth, maxDepth(child));//root->children[i]
+		}
+		return depth + 1;
+	}
+};*/
+
+/* 第48题 给你一棵 完全二叉树 的根节点 root ，求出该树的节点个数。
+完全二叉树 的定义如下：在完全二叉树中，除了最底层节点可能没填满外，其余每层节点数都达到最大值，并且最下面一层的节点都集中在该层最左边的若干位置。
+若最底层为第 h 层，则该层包含 1~ 2h 个节点
+*/
+
+class Solution {//层序递归
+public:
+	int countNodes(TreeNode* root) {
+		if (root == nullptr) {
+			return 0;
+		}
+		return 1 + countNodes(root->left) + countNodes(root->right);
+	}
+};
+
+/* 第49题 给定一个二叉树，判断它是否是高度平衡的二叉树。
+*/
+
+class Solution {//比较高度用后序遍历
+public:
+	//返回以该节点为根节点的二叉树的高度，如果不是返回-1
+	int GetHight(TreeNode* node) {
+		if (node == nullptr) {
+			return 0;
+		}
+		int leftheight = GetHight(node->left);
+		if (leftheight == -1) {
+			return -1;
+		}
+		int rightheight = GetHight(node->right);
+		if (rightheight == -1) {
+			return -1;
+		}
+		return abs(leftheight - rightheight) > 1 ? -1 : 1 + max(leftheight, rightheight);
+	}
+	bool isBalanced(TreeNode* root) {
+		return GetHight(root) == -1 ? false : true;
+	}
+};
+
+//第50题 给你一个二叉树的根节点 root ，按 任意顺序 ，返回所有从根节点到叶子节点的路径。
+
+class Solution {//前序遍历 有点费劲 理解一下
+private:
+	void traversal(TreeNode* curr, vector<int>& path, vector<string>& result) {
+		path.push_back(curr->val);
+		if (curr->left == nullptr && curr->right == nullptr) {
+			string sPath;
+			for (int i = 0;i < path.size() - 1;i++) {
+				sPath += to_string(path[i]);
+				sPath += "->";
+			}
+			sPath += to_string(path[path.size() - 1]);
+			result.push_back(sPath);
+			return;
+		}
+		if (curr->left) {
+			traversal(curr->left, path, result);
+			path.pop_back();//回溯
+		}
+		if (curr->right) {
+			traversal(curr->right, path, result);
+			path.pop_back();
+		}
+	}
+public:
+	vector<string> binaryTreePaths(TreeNode* root) {
+		vector<string>result;
+		vector<int>path;
+		if (root == nullptr) {
+			return result;
+		}
+		traversal(root, path, result);
+		return result;
+	}
+};
+
+
+class Solution {//剪枝
+private:
+
+	void traversal(TreeNode* cur, string path, vector<string>& result) {
+		path += to_string(cur->val); // 中
+		if (cur->left == NULL && cur->right == NULL) {
+			result.push_back(path);
+			return;
+		}
+		if (cur->left) traversal(cur->left, path + "->", result); // 左
+		if (cur->right) traversal(cur->right, path + "->", result); // 右
+	}
+
+public:
+	vector<string> binaryTreePaths(TreeNode* root) {
+		vector<string> result;
+		string path;
+		if (root == NULL) return result;
+		traversal(root, path, result);
+		return result;
+
+	}
+};
+
+//第51题 给定二叉树的根节点 root ，返回所有左叶子之和。
+
+class Solution {
+public:
+	int sumOfLeftLeaves(TreeNode* root) {
+		if (root == nullptr) {
+			return 0;
+		}
+		int leftValue = 0;
+		if (root->left != nullptr && root->left->left == nullptr && root->left->right == nullptr) {
+			leftValue = root->left->val;
+		}
+		return leftValue + sumOfLeftLeaves(root->left) + sumOfLeftLeaves(root->right);
+	}
+};
+
+/*第52题 给定一个二叉树的 根节点 root，请找出该二叉树的 最底层 最左边 节点的值。
+假设二叉树中至少有一个节点。
+*/
+
+class Solution {//层序遍历最优解
+public:
+	int findBottomLeftValue(TreeNode* root) {
+		queue<TreeNode*>que;
+		if (root != nullptr) {
+			que.push(root);
+		}
+		int result = 0;
+		while (!que.empty()) {
+			int size = que.size();
+			for (int i = 0;i < size;i++) {
+				TreeNode* node = que.front();
+				que.pop();
+				if (i == 0) {
+					result = node->val;
+				}
+				if (node->left) {
+					que.push(node->left);
+				}
+				if (node->right) {
+					que.push(node->right);
+				}
+			}
+		}
+		return result;
+	}
+};
+
+/*第53题 给你二叉树的根节点 root 和一个表示目标和的整数 targetSum 。
+判断该树中是否存在 根节点到叶子节点 的路径，这条路径上所有节点值相加等于目标和 targetSum 。
+如果存在，返回 true ；否则，返回 false 。
+*/
+
+class Solution {
+private:
+	bool traversal(TreeNode* curr, int count) {
+		if (!curr->left && !curr->right && count == 0) {
+			return true;
+		}
+		if (!curr->left && !curr->right) {
+			return false;
+		}
+		if (curr->left) {
+			count -= curr->left->val;
+			if (traversal(curr->left, count)) {
+				return true;
+			}
+			count += curr->left->val;
+		}
+		if (curr->right) {
+			count -= curr->right->val;
+			if (traversal(curr->right, count)) {
+				return true;
+			}
+			count += curr->right->val;
+		}
+		return false;
+	}
+public:
+	bool hasPathSum(TreeNode* root, int targetSum) {
+		if (root == nullptr) {
+			return false;
+		}
+		return traversal(root, targetSum - root->val);
+	}
+};
+
+class Solution {//剪枝
+public:
+	bool hasPathSum(TreeNode* root, int targetSum) {
+		if (!root) {
+			return false;
+		}
+		if (!root->left && !root->right && targetSum == root->val) {
+			return true;
+		}
+		return hasPathSum(root->left, targetSum - root->val) || hasPathSum(root->right, targetSum - root->val);
+	}
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
